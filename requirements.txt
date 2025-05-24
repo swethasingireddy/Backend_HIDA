@@ -1,0 +1,7 @@
+Flask==2.0.3
+Flask-CORS==5.0.1
+tensorflow==2.19.0
+librosa==0.10.2.post1
+pandas==2.2.2
+numpy==1.26.4
+werkzeug==2.0.3
