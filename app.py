@@ -11,9 +11,13 @@ app = Flask(__name__)
 CORS(app)
 
 
+# Ensure that the port is being retrieved from the environment variable
+port = int(os.environ.get('PORT', 5001))  # Render assigns PORT, otherwise default to 5001
+
+
 def download_file_from_google_drive(file_id, destination):
     URL = "https://docs.google.com/uc?export=download"
-    session = request.Session()
+    session = requests.Session()
 
     print(f"Starting download from Google Drive file id: {file_id} ...")
 
@@ -26,6 +30,7 @@ def download_file_from_google_drive(file_id, destination):
             break
 
     if token:
+        
         params = {'id': file_id, 'confirm': token}
         response = session.get(URL, params=params, stream=True)
 
@@ -35,6 +40,7 @@ def download_file_from_google_drive(file_id, destination):
                 f.write(chunk)
 
     print(f"Download completed: {destination}")
+
 
 def extract_zip(zip_path, extract_to):
     print(f"Extracting {zip_path} to {extract_to} ...")
@@ -53,13 +59,13 @@ CLASS_MAP_FILE_ID = '1dBjlS4aVXdKqSYhelLb6_W9OKMUFnAVY'
 YAMNET_MODEL_ZIP = os.path.join(BASE_DIR, 'yamnet_model.zip')
 CLASS_MAP_ZIP = os.path.join(BASE_DIR, 'yamnet_class_map.zip')
 
-
+# Download and extract model if not already present
 if not os.path.isdir(os.path.join(MODEL_DIR, 'yamnet-tensorflow2-yamnet-v1')):
     download_file_from_google_drive(YAMNET_MODEL_FILE_ID, YAMNET_MODEL_ZIP)
     extract_zip(YAMNET_MODEL_ZIP, MODEL_DIR)
     os.remove(YAMNET_MODEL_ZIP)
 
-
+# Download and extract class map if not already present
 if not os.path.isfile(os.path.join(MODEL_DIR, 'yamnet_class_map.csv')):
     download_file_from_google_drive(CLASS_MAP_FILE_ID, CLASS_MAP_ZIP)
     extract_zip(CLASS_MAP_ZIP, MODEL_DIR)
@@ -71,8 +77,6 @@ yamnet_model = tf.saved_model.load(yamnet_model_path)
 
 class_map_path = os.path.join(MODEL_DIR, 'yamnet_class_map.csv')
 class_names = pd.read_csv(class_map_path)['display_name'].tolist()
-
-
 
 hazardous_classes = {11, 102, 181, 280, 281, 307, 316, 317, 318, 319,
                      390, 393, 394, 420, 421, 422, 423, 424, 428, 429}
@@ -86,6 +90,7 @@ CHUNK_SAMPLES = int(SAMPLE_RATE * CHUNK_DURATION)
 def load_audio(file_path):
     waveform, sr = librosa.load(file_path, sr=SAMPLE_RATE)
     return waveform
+
 
 def classify_single_chunk(waveform):
     if len(waveform) < CHUNK_SAMPLES:
@@ -132,6 +137,6 @@ def predict():
         traceback.print_exc()
         return jsonify({'error': 'Prediction error.'}), 500
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5001)), debug=True)
 
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=port)  # Now using dynamic port defined by environment variable
