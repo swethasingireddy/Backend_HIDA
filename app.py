@@ -1,12 +1,11 @@
 import os
-from flask import Flask, request, jsonify
+from flask import Flask, requests,request, jsonify
 from flask_cors import CORS
 import tensorflow as tf
 import librosa
 import numpy as np
 import pandas as pd
 import traceback
-
 app = Flask(__name__)
 CORS(app)
 
@@ -17,7 +16,7 @@ port = int(os.environ.get('PORT', 5001))  # Render assigns PORT, otherwise defau
 
 def download_file_from_google_drive(file_id, destination):
     URL = "https://docs.google.com/uc?export=download"
-    session = request.Session()
+    session = requests.Session()
 
     print(f"Starting download from Google Drive file id: {file_id} ...")
 
