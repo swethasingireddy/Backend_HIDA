@@ -17,7 +17,7 @@ port = int(os.environ.get('PORT', 5001))  # Render assigns PORT, otherwise defau
 
 def download_file_from_google_drive(file_id, destination):
     URL = "https://docs.google.com/uc?export=download"
-    session = requests.Session()
+    session = request.Session()
 
     print(f"Starting download from Google Drive file id: {file_id} ...")
 
