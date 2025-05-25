@@ -1,6 +1,4 @@
 import os
-import requests
-import zipfile
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import tensorflow as tf
@@ -28,7 +26,6 @@ def download_file_from_google_drive(file_id, destination):
             break
 
     if token:
-        
         params = {'id': file_id, 'confirm': token}
         response = session.get(URL, params=params, stream=True)
 
@@ -46,7 +43,6 @@ def extract_zip(zip_path, extract_to):
     print("Extraction completed.")
 
 
-
 BASE_DIR = os.getcwd()
 MODEL_DIR = os.path.join(BASE_DIR, 'models')
 os.makedirs(MODEL_DIR, exist_ok=True)
@@ -57,13 +53,13 @@ CLASS_MAP_FILE_ID = '1dBjlS4aVXdKqSYhelLb6_W9OKMUFnAVY'
 YAMNET_MODEL_ZIP = os.path.join(BASE_DIR, 'yamnet_model.zip')
 CLASS_MAP_ZIP = os.path.join(BASE_DIR, 'yamnet_class_map.zip')
 
-# Download and extract model if not already present
+
 if not os.path.isdir(os.path.join(MODEL_DIR, 'yamnet-tensorflow2-yamnet-v1')):
     download_file_from_google_drive(YAMNET_MODEL_FILE_ID, YAMNET_MODEL_ZIP)
     extract_zip(YAMNET_MODEL_ZIP, MODEL_DIR)
     os.remove(YAMNET_MODEL_ZIP)
 
-# Download and extract class map if not already present
+
 if not os.path.isfile(os.path.join(MODEL_DIR, 'yamnet_class_map.csv')):
     download_file_from_google_drive(CLASS_MAP_FILE_ID, CLASS_MAP_ZIP)
     extract_zip(CLASS_MAP_ZIP, MODEL_DIR)
@@ -111,7 +107,6 @@ def classify_single_chunk(waveform):
     return prediction
 
 
-
 @app.route('/predict', methods=['POST'])
 def predict():
     try:
@@ -138,4 +133,5 @@ def predict():
         return jsonify({'error': 'Prediction error.'}), 500
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5001, debug=True)
+   
+    pass
