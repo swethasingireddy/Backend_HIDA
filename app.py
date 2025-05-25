@@ -1,19 +1,16 @@
 import os
-from flask import Flask, request, jsonify
 import requests
+import zipfile
+from flask import Flask, request, jsonify
 from flask_cors import CORS
 import tensorflow as tf
 import librosa
 import numpy as np
 import pandas as pd
 import traceback
-import zipfile
+
 app = Flask(__name__)
 CORS(app)
-
-
-# Ensure that the port is being retrieved from the environment variable
-port = int(os.environ.get('PORT', 5001))  # Render assigns PORT, otherwise default to 5001
 
 
 def download_file_from_google_drive(file_id, destination):
@@ -41,7 +38,6 @@ def download_file_from_google_drive(file_id, destination):
                 f.write(chunk)
 
     print(f"Download completed: {destination}")
-
 
 def extract_zip(zip_path, extract_to):
     print(f"Extracting {zip_path} to {extract_to} ...")
@@ -92,7 +88,6 @@ def load_audio(file_path):
     waveform, sr = librosa.load(file_path, sr=SAMPLE_RATE)
     return waveform
 
-
 def classify_single_chunk(waveform):
     if len(waveform) < CHUNK_SAMPLES:
         waveform = np.pad(waveform, (0, CHUNK_SAMPLES - len(waveform)), mode='constant')
@@ -111,7 +106,6 @@ def classify_single_chunk(waveform):
         'semi_immediate': top_class in semi_immediate_classes
     }
     return prediction
-
 
 @app.route('/predict', methods=['POST'])
 def predict():
@@ -138,6 +132,7 @@ def predict():
         traceback.print_exc()
         return jsonify({'error': 'Prediction error.'}), 500
 
-
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=port)  # Now using dynamic port defined by environment variable
+
+    port = int(os.environ.get("PORT", 5001))  
+    app.run(host='0.0.0.0', port=port, debug=False)
