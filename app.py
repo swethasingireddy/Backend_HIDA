@@ -13,7 +13,7 @@ CORS(app)
 
 def download_file_from_google_drive(file_id, destination):
     URL = "https://docs.google.com/uc?export=download"
-    session = requests.Session()
+    session = request.Session()
 
     print(f"Starting download from Google Drive file id: {file_id} ...")
 
@@ -133,6 +133,5 @@ def predict():
         return jsonify({'error': 'Prediction error.'}), 500
 
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5001))
-    app.run(host='0.0.0.0', port=port, debug=True)
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5001)), debug=True)
 
